@@ -12,8 +12,7 @@ import { SalesData } from "@/types/types";
 import SalesInput from "../sales/SalesInput";
 import { fetchSalesById } from "@/api/SalesApi";
 import { useSales } from "@/hooks/useSales";
-import ExportPdf from "../ExportPdf";
-// import ProductInput from "./ProductInput";
+import Invoice from "../ExportPdf";
 
 interface SalesActionsDropdownProps {
   sales: SalesData;
@@ -43,6 +42,7 @@ const ProductActionButton = ({ sales }: SalesActionsDropdownProps) => {
     console.log(data);
     setPdf(data);
   };
+
   return (
     <>
       <DropdownMenu>
@@ -55,7 +55,7 @@ const ProductActionButton = ({ sales }: SalesActionsDropdownProps) => {
           <DropdownMenuItem onClick={handleUpdate}>Update</DropdownMenuItem>
           <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
           <DropdownMenuItem onClick={handleExport}>
-            {pdf && <ExportPdf saleData={pdf} />}
+            <Invoice invoiceData={pdf} />
           </DropdownMenuItem>
         </DropdownMenuContent>
         {SalesInput && (

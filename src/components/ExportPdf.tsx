@@ -1,98 +1,97 @@
 import { SalesData } from "@/types/types";
-import { OutputType } from "jspdf-invoice-template";
-import jsPDFInvoiceTemplate from "jspdf-invoice-template";
-import React from "react";
-const generateInvoicePDF = (saleData: SalesData) => {
-  console.log(saleData);
-  const props = {
-    outputType: OutputType.Save,
-    returnJsPDFDocObject: true,
-    fileName: "Invoice",
-    orientationLandscape: false,
-    compress: true,
-    logo: {
-      src: "",
-      type: "PNG",
-      width: 53.33,
-      height: 26.66,
-      margin: {
-        top: 0,
-        left: 0,
-      },
-    },
-    stamp: {
-      inAllPages: true,
-      src: "",
-      width: 20,
-      height: 20,
-      margin: {
-        top: 0,
-        left: 0,
-      },
-    },
-    business: {
-      name: "Patoliya",
-      address: "Utran",
-      phone: "(+1) 123 456 789",
-      email: "patoliya@gmail.com",
-      website: "patoliya.com",
-    },
-    contact: {
-      label: "Invoice issued for:",
-      name: saleData.name?.toString(),
-      phone: saleData.phone?.toString(),
-      email: saleData.email?.toString(),
-    },
-    invoice: {
-      label: "Invoice #: ",
-      num: saleData._id,
-      invGenDate: "Generated Date: " + new Date().toLocaleDateString(),
-      headerBorder: false,
-      tableBodyBorder: false,
-      header: [
-        { title: "Name", style: { width: 10 } },
-        { title: "Email", style: { width: 30 } },
-        { title: "Price", style: { width: 80 } },
-        { title: "Quantity", style: { width: 30 } },
-        { title: "Total", style: { width: 30 } },
-      ],
-      table: [
-        saleData.name?.toString(),
-        saleData.email?.toString(),
-        saleData.price?.toString(),
-        saleData.quantity?.toString(),
-        saleData.productName.toString(),
-      ],
-      additionalRows: [
-        {
-          col1: "Total:",
-          col2: saleData.totalPrice?.toString(),
-          style: { fontSize: 14 },
-        },
-      ],
-      invDescLabel: "Invoice Note",
-      invDesc: "Thank you for your business.",
-    },
-    footer: {
-      text: "The invoice is created on a computer and is valid without the signature and seal.",
-    },
-    pageEnable: true,
-    pageLabel: "Page ",
-  };
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
-  jsPDFInvoiceTemplate(props);
-};
-
-interface ExportPdfProps {
-  saleData: SalesData;
+interface InvoiceProps {
+  invoiceData: SalesData;
 }
 
-const ExportPdf: React.FC<ExportPdfProps> = ({ saleData }) => {
+const InvoiceGenerator: React.FC<InvoiceProps> = ({ invoiceData }) => {
+  const generatePDF = () => {
+    const doc = new jsPDF();
+
+    // Add logo
+    // doc.addImage("images.jpeg", "JPEG", 160, 10, 40, 20);
+
+    // Header
+    doc.setFontSize(22);
+    doc.text("INVOICE", 20, 20);
+
+    // Seller details
+    doc.setFontSize(10);
+    doc.text("PatoliyaInfo Tech", 200, 20, { align: "right" });
+
+    // Customer details
+    doc.setFontSize(14);
+    doc.text(`Dear ${invoiceData.name}`, 20, 50);
+    doc.setFontSize(10);
+    doc.text(
+      "Here are your order details. We thank you for your purchase.",
+      20,
+      60
+    );
+
+    // Order details
+    doc.text(`Order ID: #${invoiceData.productName}`, 20, 80);
+    doc.text(`Email: ${invoiceData.email}`, 20, 87);
+    doc.text(`Phone: ${invoiceData.phone}`, 20, 94);
+    // doc.text(`Shipment ID: #${invoiceData.shipmentId}`, 20, 101);
+
+    // Addresses
+    // doc.setFontSize(12);
+    // doc.text("Billing Address:", 20, 120);
+    // doc.setFontSize(10);
+    // doc.text(invoiceData.billingAddress.split(","), 20, 130);
+
+    // doc.setFontSize(12);
+    // doc.text("Shipping Address:", 110, 120);
+    // doc.setFontSize(10);
+    // doc.text(invoiceData.shippingAddress.split(","), 110, 130);
+
+    // Products table
+    const tableColumn = ["Products", "SKU", "QTY", "Total"];
+    const tableRows = [
+      [
+        invoiceData.productName,
+        invoiceData.sku || "N/A", // Add a fallback for SKU if missing
+        invoiceData.quantity,
+        `$${invoiceData.totalPrice?.toFixed(2) || "0.00"}`, // Add fallback for totalPrice
+      ],
+    ];
+
+    autoTable(doc, {
+      startY: 110, // Adjusted Y-position for table
+      head: [tableColumn],
+      body: tableRows,
+      theme: "striped",
+      headStyles: { fillColor: [0, 0, 0] },
+    });
+
+    // Totals
+    const finalY = doc.lastAutoTable.finalY || 120; // Ensure we get the Y-position after the table
+    doc.setFontSize(12);
+    doc.text(
+      `Subtotal: $${invoiceData.totalPrice?.toFixed(2) || "0.00"}`,
+      150,
+      finalY + 10
+    );
+    doc.text(
+      `Total: $${invoiceData.totalPrice?.toFixed(2) || "0.00"}`,
+      150,
+      finalY + 20
+    );
+
+    doc.save("invoice.pdf");
+  };
+
   return (
-    <div>
-      <button onClick={() => generateInvoicePDF(saleData)}>Generate PDF</button>
-    </div>
+    <button
+      onClick={generatePDF}
+      className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+    >
+      Download Invoice
+    </button>
   );
 };
 
-export default ExportPdf;
+export default InvoiceGenerator;
