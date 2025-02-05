@@ -64,9 +64,10 @@ const SalesInput = ({ isOpen, onClose, sales }: SalesInputProps) => {
 
   useEffect(() => {
     if (action === "update" && sales) {
-      const { name, image, email, phone, selectedProducts } = sales;
-      form.reset({ name, image, email, phone, selectedProducts });
+      const { name, image, email, phone, selectedProducts, totalPrice } = sales;
+      form.reset({ name, image, email, phone, selectedProducts, totalPrice });
     } else if (action === "add") {
+      console.log("Resetting form to initial values");
       form.reset({
         name: "",
         image: "",
@@ -77,6 +78,9 @@ const SalesInput = ({ isOpen, onClose, sales }: SalesInputProps) => {
       });
     }
   }, [action, form, sales]);
+  useEffect(() => {
+    console.log("Sales Data:", sales);
+  }, [sales]);
 
   const handleAddProduct = () => {
     const currentProducts = form.getValues("selectedProducts") || [];
