@@ -36,6 +36,24 @@ export type SalesData = {
   totalPrice?: number;
 };
 
+export interface SalesPDF {
+  _id?: string | number | undefined;
+  name: string;
+  image: string;
+  email: string;
+  phone: number;
+  selectedProducts: {
+    productId: {
+      _id: string;
+      name: string;
+      price: number;
+    };
+    quantity: number;
+    _id: string;
+  }[];
+  totalPrice: number;
+}
+
 export type SalesInputProps = {
   isOpen: boolean;
   onClose: () => void;
