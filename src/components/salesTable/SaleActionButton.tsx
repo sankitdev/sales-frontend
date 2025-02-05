@@ -26,12 +26,12 @@ const ProductActionButton = ({ sales }: SalesActionsDropdownProps) => {
 
   const handleUpdate = async () => {
     if (!sales._id) return;
-    console.log(sales._id);
     setAction("update");
-    toggleDialog();
     try {
       const data = await fetchSalesById(sales._id);
+      console.log(data);
       setSalesData(data);
+      toggleDialog();
     } catch (error) {
       console.error("Failed to fetch sales data", error);
     }
