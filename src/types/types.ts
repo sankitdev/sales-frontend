@@ -27,9 +27,12 @@ export type SalesData = {
   image: string;
   email?: string;
   phone: string;
-  productName: string;
-  quantity?: number;
-  price?: number;
+  selectedProducts: {
+    productId: string;
+    name: string;
+    quantity: number;
+    price: number;
+  }[];
   totalPrice?: number;
 };
 
