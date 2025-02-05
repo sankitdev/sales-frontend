@@ -1,9 +1,9 @@
 "use client";
-
 import React from "react";
 import { Button } from "./ui/button";
 import { SalesPDF } from "@/types/types";
 import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface ExportPdfProps {
   saleData: SalesPDF;
@@ -17,77 +17,72 @@ export function ExportPdf({ saleData }: ExportPdfProps) {
       format: "a4",
     });
 
-    let y = 10; // Start position for text
+    let y = 10;
 
-    // Title: Invoice
+    // Load External Logo (Replace with your actual image URL)
+    const logoUrl =
+      "https://images-platform.99static.com/OTwRVhH8dr3fC4eyzFsA5aRF6u4=/199x199:1799x1799/500x500/top/smart/99designs-contests-attachments/146/146370/attachment_146370174";
+    pdf.addImage(logoUrl, "PNG", 160, y, 40, 15);
+    y += 20;
+
+    // Title: INVOICE
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(22);
-    pdf.text("Invoice", 105, y, { align: "center" });
-    y += 15;
+    pdf.text("INVOICE", 10, y);
+    y += 10;
 
-    // Invoice Information
+    // Invoice Details
     pdf.setFontSize(12);
     pdf.setFont("helvetica", "normal");
-    pdf.text(`Invoice #${saleData._id}`, 10, y);
+    pdf.text(`Invoice ID: #${saleData._id}`, 10, y);
+    pdf.text(`Date: ${new Date().toLocaleDateString()}`, 150, y);
     y += 6;
-    pdf.text(`Date: ${new Date().toLocaleDateString()}`, 10, y);
+    pdf.text(`Shipment ID: #SHP-0025410`, 10, y);
+    y += 10;
+
+    // Customer Details Section
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Billing Address", 10, y);
+    pdf.text("Shipping Address", 110, y);
     y += 6;
-    pdf.text(`Billing Address:`, 10, y);
-    y += 6;
+
+    pdf.setFont("helvetica", "normal");
     pdf.text(`Name: ${saleData.name || "N/A"}`, 10, y);
+    pdf.text(`Unit 1/23 Hastings Road, Melbourne 3000`, 110, y);
     y += 6;
     pdf.text(`Phone: ${saleData.phone || "N/A"}`, 10, y);
     y += 6;
-    if (saleData.email) {
-      pdf.text(`Email: ${saleData.email}`, 10, y);
-      y += 8;
-    }
+    pdf.text(`Email: ${saleData.email || "N/A"}`, 10, y);
+    y += 10;
 
-    // Line Break
+    // Draw a Line
     pdf.setDrawColor(0);
     pdf.line(10, y, 200, y);
-    y += 4;
-
-    // Table Header
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Item", 10, y);
-    pdf.text("Qty", 120, y);
-    pdf.text("Price", 150, y);
-    pdf.text("Total", 180, y);
     y += 6;
-    pdf.setDrawColor(0);
-    pdf.line(10, y, 200, y);
-    y += 4;
 
-    // Items List
-    pdf.setFont("helvetica", "normal");
-    saleData.selectedProducts.forEach((product) => {
-      const productName = product.productId.name || "Unknown Product";
-      const productPrice = product.productId.price || 0;
-
-      pdf.text(productName, 10, y);
-      pdf.text(String(product.quantity), 120, y);
-      pdf.text(`$${productPrice}`, 150, y);
-      pdf.text(`$${saleData.totalPrice}`, 180, y);
-      y += 6;
+    // Product Table
+    autoTable(pdf, {
+      startY: y,
+      head: [["Name", "Quantity", "Price", "Total"]],
+      body: saleData.selectedProducts.map((product) => [
+        product.productId.name || "Unknown Product",
+        product.quantity,
+        `INR ${product.productId.price}`,
+        `INR ${product.quantity * product.productId.price}`,
+      ]),
+      theme: "grid",
+      styles: { fontSize: 10 },
     });
 
-    // Line Break
-    pdf.setDrawColor(0);
-    pdf.line(10, y, 200, y);
-    y += 4;
-
-    // Total Price Section
-    y += 6;
-    pdf.setFont("helvetica", "bold");
-    pdf.text(`Subtotal: $${saleData.totalPrice}`, 10, y);
-    y += 6;
-    pdf.text(`Total Price: $${saleData.totalPrice}`, 10, y);
+    // Total Price
+    const { lastAutoTable } = pdf as any;
+    y = lastAutoTable ? lastAutoTable.finalY + 10 : y + 10;
+    pdf.text(`Total Price:  INR ${saleData.totalPrice}`, 10, y);
 
     // Footer
     y += 10;
     pdf.setFont("helvetica", "italic");
-    pdf.text("Thank you for your business!", 105, y, { align: "center" });
+    pdf.text("Thank you for your purchase!", 10, y);
 
     // Save the PDF
     pdf.save(`${saleData._id || "invoice"}.pdf`);
