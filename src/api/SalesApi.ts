@@ -7,7 +7,6 @@ export async function fetchSales(): Promise<SalesData[]> {
     const response = await axios.get(`${URL}/sales`, {
       withCredentials: true,
     });
-    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error", error);
