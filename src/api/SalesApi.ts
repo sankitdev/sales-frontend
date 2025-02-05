@@ -7,6 +7,7 @@ export async function fetchSales(): Promise<SalesData[]> {
     const response = await axios.get(`${URL}/sales`, {
       withCredentials: true,
     });
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error", error);
@@ -46,10 +47,10 @@ export async function fetchSalesById(salesId: number): Promise<SalesData> {
 
 export async function updateSales(salesId: number, values: SalesData) {
   try {
-    const { name, image, quantity, productName, email } = values;
+    const { name, image, email, selectedProducts } = values;
     const response = await axios.patch(
       `${URL}/sale/${salesId}`,
-      { name, image, quantity, email, productName },
+      { name, image, email, selectedProducts },
       {
         withCredentials: true,
       }
