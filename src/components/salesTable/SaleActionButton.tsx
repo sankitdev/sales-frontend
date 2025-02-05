@@ -12,6 +12,7 @@ import { SalesData } from "@/types/types";
 import SalesInput from "../sales/SalesInput";
 import { fetchSalesById } from "@/api/SalesApi";
 import { useSales } from "@/hooks/useSales";
+import { ExportPdf } from "../ExportPdf";
 
 interface SalesActionsDropdownProps {
   sales: SalesData;
@@ -24,6 +25,7 @@ const ProductActionButton = ({ sales }: SalesActionsDropdownProps) => {
   const [pdf, setPdf] = useState<SalesData | null>(null);
   const handleUpdate = async () => {
     if (!sales._id) return;
+    console.log(sales._id);
     setAction("update");
     toggleDialog();
     try {
@@ -37,6 +39,7 @@ const ProductActionButton = ({ sales }: SalesActionsDropdownProps) => {
     if (sales._id) remove(sales._id);
   };
   const handleExport = async () => {
+    console.log(sales._id);
     const data = await fetchSalesById(sales._id!);
     console.log(pdf);
     setPdf(data);
@@ -54,7 +57,8 @@ const ProductActionButton = ({ sales }: SalesActionsDropdownProps) => {
           <DropdownMenuItem onClick={handleUpdate}>Update</DropdownMenuItem>
           <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
           <DropdownMenuItem onClick={handleExport}>
-            {/* <Invoice invoiceData={pdf} /> */}
+            {/* {pdf && <ExportPdf saleData={pdf} />} */}
+            Export
           </DropdownMenuItem>
         </DropdownMenuContent>
         {SalesInput && (
