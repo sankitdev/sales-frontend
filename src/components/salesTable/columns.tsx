@@ -24,24 +24,45 @@ export const columns: ColumnDef<SalesData>[] = [
   {
     accessorKey: "phone",
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="phone" />;
+      return <DataTableColumnHeader column={column} title="Phone" />;
     },
   },
   {
-    accessorKey: "quantity",
-    header: "Quantity",
+    id: "productNames",
+    header: "Product(s)",
+    cell: ({ row }) => {
+      const products = row.original.selectedProducts;
+      return (
+        <div>
+          {products.map((product, index) => (
+            <div key={index}>
+              {product.productId.name} (Quantity: {product.quantity}, Price: ₹
+              {product.productId.price})
+            </div>
+          ))}
+        </div>
+      );
+    },
   },
   {
-    accessorKey: "productName.name",
-    header: "Product",
+    id: "totalQuantity",
+    header: "Total Quantity",
+    cell: ({ row }) => {
+      const products = row.original.selectedProducts;
+      const totalQuantity = products.reduce(
+        (sum, product) => sum + product.quantity,
+        0
+      );
+      return <span>{totalQuantity}</span>;
+    },
   },
   {
-    accessorKey: "price",
-    header: "Price",
-  },
-  {
-    accessorKey: "totalPrice",
+    id: "totalPrice",
     header: "Total Price",
+    cell: ({ row }) => {
+      const totalPrice = row.original.totalPrice;
+      return <span>₹{totalPrice}</span>;
+    },
   },
   {
     id: "actions",
