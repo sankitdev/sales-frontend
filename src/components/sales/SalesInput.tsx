@@ -30,6 +30,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { fetchProducts } from "@/api/ProductApi";
+import QuantityInput from "./Quantity";
 
 const SalesInput = ({ isOpen, onClose, sales }: SalesInputProps) => {
   const { action } = useContext(DialogContext);
@@ -50,22 +51,15 @@ const SalesInput = ({ isOpen, onClose, sales }: SalesInputProps) => {
   const [invalidProducts, setInvalidProducts] = useState<number[]>([]);
 
   useEffect(() => {
-    let isMounted = true;
-
     const fetchProduct = async () => {
       try {
         const response = await fetchProducts();
-        if (isMounted) setProducts(response);
+        setProducts(response);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
     };
-
     fetchProduct();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
   useEffect(() => {
@@ -330,17 +324,10 @@ const SalesInput = ({ isOpen, onClose, sales }: SalesInputProps) => {
                           ))}
                         </SelectContent>
                       </Select>
-                      <Input
-                        type="number"
-                        value={product.quantity}
-                        placeholder="Quantity"
-                        min="1"
-                        max={"100"}
-                        onChange={(e) =>
-                          handleQuantityChange(index, Number(e.target.value))
-                        }
-                        className="w-20"
-                        required
+                      <QuantityInput
+                        index={index}
+                        product={product}
+                        handleQuantityChange={handleQuantityChange}
                       />
                       <div className="flex items-center space-x-2">
                         <span className="whitespace-nowrap">
