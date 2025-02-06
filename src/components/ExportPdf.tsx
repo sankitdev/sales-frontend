@@ -19,7 +19,7 @@ export function ExportPdf({ saleData }: ExportPdfProps) {
 
     let y = 10;
 
-    // Load External Logo (Replace with your actual image URL)
+    // Load External Logo
     const logoUrl =
       "https://images-platform.99static.com/OTwRVhH8dr3fC4eyzFsA5aRF6u4=/199x199:1799x1799/500x500/top/smart/99designs-contests-attachments/146/146370/attachment_146370174";
     pdf.addImage(logoUrl, "PNG", 160, y, 40, 15);
